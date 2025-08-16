@@ -144,25 +144,18 @@ export default function Admin() {
   };
 
   const handleUsePrefilled = () => {
-    if (usePrefilled) {
-      const prefilledOptions = getRandomOptions(envelopeCount);
-      setEnvelopes(prev => 
-        prev.map((env, index) => ({
-          ...env,
-          prizeText: prefilledOptions[index]?.prizeText || env.prizeText,
-          color: prefilledOptions[index]?.color || env.color
-        }))
-      );
-      toast({
-        title: "Prefilled Options Applied",
-        description: "Romantic anniversary ideas have been loaded!",
-      });
-    } else {
-      // Clear all prize texts when turning off prefilled
-      setEnvelopes(prev => 
-        prev.map(env => ({ ...env, prizeText: "" }))
-      );
-    }
+    const prefilledOptions = getRandomOptions(envelopeCount);
+    setEnvelopes(prev => 
+      prev.map((env, index) => ({
+        ...env,
+        prizeText: prefilledOptions[index]?.prizeText || env.prizeText,
+        color: prefilledOptions[index]?.color || env.color
+      }))
+    );
+    toast({
+      title: "Prefilled Options Applied",
+      description: "Romantic anniversary ideas have been loaded!",
+    });
   };
 
   const getColorClass = (color: string) => {

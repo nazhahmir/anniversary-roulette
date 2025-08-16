@@ -2,6 +2,13 @@
 // Research-based options that avoid alcohol/vineyard activities
 
 export const ROMANTIC_ANNIVERSARY_OPTIONS = [
+  // Weekend Getaways & Hotels
+  "Weekend getaway to Sausalito waterfront hotel",
+  "Romantic stay at Cavallo Point Lodge with Golden Gate views",
+  "Napa Valley luxury spa resort weekend",
+  "Carmel-by-the-Sea cottage retreat with ocean views",
+  "Half Moon Bay Ritz-Carlton oceanfront escape",
+  
   // Scenic & Adventure Experiences
   "Golden Gate Bridge bike ride to Sausalito with ferry return",
   "Sunrise hot air balloon ride over Napa Valley",
@@ -10,35 +17,34 @@ export const ROMANTIC_ANNIVERSARY_OPTIONS = [
   "Whale watching cruise around San Francisco Bay",
   "Private airplane sunset tour over the bay",
   
-  // Cultural & Creative Experiences
-  "Foreign Cinema: dinner while watching movies under the stars",
-  "Couples pottery class with 'Ghost' movie vibes",
-  "Private dance lesson: salsa, swing, or ballroom",
-  "California Academy of Sciences NightLife with planetarium",
-  "Candlelight classical concert at St. Ignatius Church",
-  "Private chef five-star dinner experience at home",
-  
-  // Unique & Quirky Activities
-  "Church of 8 Wheels: adults-only roller disco in converted church",
-  "Mission Bowling Club: upscale bowling with craft dining",
-  "Berber: Moroccan supper club with live cirque performances",
-  "Alcatraz night tour: explore the infamous prison after dark",
-  
-  // Romantic Restaurants
-  "Waterbar dinner with Bay Bridge views (popular proposal spot)",
+  // Fine Dining Experiences
   "Atelier Crenn: Michelin-starred 'poetic culinaria' tasting menu",
   "Quince: opulent Michelin-starred Italian with plush interiors",
-  "Boulevard: classic American cuisine near Bay Bridge",
-  "Verjus: French bistro with glossy maroon ceiling & candlelight",
-  "L'Ardoise: Parisian-style bistro with dark leather booths",
+  "Boulevard: classic American cuisine with Bay Bridge views",
+  "Waterbar dinner overlooking the bay (popular proposal spot)",
+  "Verjus: intimate French bistro with candlelit ambiance",
+  "Private chef five-star dinner experience at home",
   
-  // Scenic & Garden Spots
+  // Cultural & Creative Experiences
+  "Foreign Cinema: dinner while watching movies under the stars",
+  "Couples pottery class with romantic 'Ghost' movie vibes",
+  "Private dance lesson: salsa, swing, or ballroom",
+  "California Academy of Sciences NightLife with planetarium shows",
+  "Candlelight classical concert at St. Ignatius Church",
+  "Wine tasting tour through Sonoma County vineyards",
+  
+  // Unique Activities
+  "Church of 8 Wheels: adults-only roller disco in converted church",
+  "Mission Bowling Club: upscale bowling with gourmet dining",
+  "Alcatraz night tour: explore the infamous prison after dark",
+  "Couples massage at luxury spa in Union Square",
+  "Horse-drawn carriage ride through Golden Gate Park",
+  
+  // Scenic Spots & Gardens
   "Japanese Tea Garden: tranquil paths, koi ponds, traditional architecture",
-  "San Francisco Botanical Garden: 55 acres in Golden Gate Park",
-  "Crissy Field picnic with Golden Gate Bridge views",
+  "Crissy Field sunset picnic with Golden Gate Bridge views",
   "Lands End Trail: coastal hike with ocean views & Sutro Baths ruins",
-  "Alamo Square: Painted Ladies views for romantic picnics",
-  "Battery Park: former masonry fort with Golden Gate & downtown views"
+  "Alamo Square: Painted Ladies views for romantic picnics"
 ];
 
 export const ENVELOPE_COLORS = [
