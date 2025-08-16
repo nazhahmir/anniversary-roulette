@@ -1,0 +1,130 @@
+import { 
+  gameConfigs, 
+  envelopes, 
+  gameStates,
+  users,
+  type GameConfig, 
+  type InsertGameConfig, 
+  type Envelope, 
+  type InsertEnvelope,
+  type GameState,
+  type InsertGameState,
+  type User, 
+  type InsertUser 
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, asc } from "drizzle-orm";
+
+export interface IStorage {
+  // User methods (legacy)
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  
+  // Game config methods
+  getGameConfig(): Promise<GameConfig | undefined>;
+  createOrUpdateGameConfig(config: InsertGameConfig): Promise<GameConfig>;
+  
+  // Envelope methods
+  getAllEnvelopes(): Promise<Envelope[]>;
+  createEnvelope(envelope: InsertEnvelope): Promise<Envelope>;
+  updateEnvelope(id: string, envelope: Partial<InsertEnvelope>): Promise<Envelope | undefined>;
+  deleteAllEnvelopes(): Promise<void>;
+  
+  // Game state methods
+  getCurrentGameState(): Promise<GameState | undefined>;
+  createOrUpdateGameState(state: InsertGameState): Promise<GameState>;
+  resetGameState(): Promise<GameState>;
+}
+
+export class DatabaseStorage implements IStorage {
+  // User methods (legacy)
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  // Game config methods
+  async getGameConfig(): Promise<GameConfig | undefined> {
+    const [config] = await db.select().from(gameConfigs).limit(1);
+    return config || undefined;
+  }
+
+  async createOrUpdateGameConfig(config: InsertGameConfig): Promise<GameConfig> {
+    // Delete existing config and create new one (simple approach)
+    await db.delete(gameConfigs);
+    const [newConfig] = await db
+      .insert(gameConfigs)
+      .values(config)
+      .returning();
+    return newConfig;
+  }
+
+  // Envelope methods
+  async getAllEnvelopes(): Promise<Envelope[]> {
+    return await db.select().from(envelopes).orderBy(asc(envelopes.position));
+  }
+
+  async createEnvelope(envelope: InsertEnvelope): Promise<Envelope> {
+    const [newEnvelope] = await db
+      .insert(envelopes)
+      .values(envelope)
+      .returning();
+    return newEnvelope;
+  }
+
+  async updateEnvelope(id: string, envelope: Partial<InsertEnvelope>): Promise<Envelope | undefined> {
+    const [updatedEnvelope] = await db
+      .update(envelopes)
+      .set(envelope)
+      .where(eq(envelopes.id, id))
+      .returning();
+    return updatedEnvelope || undefined;
+  }
+
+  async deleteAllEnvelopes(): Promise<void> {
+    await db.delete(envelopes);
+  }
+
+  // Game state methods
+  async getCurrentGameState(): Promise<GameState | undefined> {
+    const [state] = await db.select().from(gameStates).limit(1);
+    return state || undefined;
+  }
+
+  async createOrUpdateGameState(state: InsertGameState): Promise<GameState> {
+    // Delete existing state and create new one
+    await db.delete(gameStates);
+    const [newState] = await db
+      .insert(gameStates)
+      .values(state)
+      .returning();
+    return newState;
+  }
+
+  async resetGameState(): Promise<GameState> {
+    const config = await this.getGameConfig();
+    const maxTries = config?.maxTries || 3;
+    
+    return this.createOrUpdateGameState({
+      selectedEnvelopes: [],
+      remainingTries: maxTries,
+      isGameComplete: false,
+    });
+  }
+}
+
+export const storage = new DatabaseStorage();
