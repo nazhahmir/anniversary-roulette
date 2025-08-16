@@ -7,6 +7,7 @@ export const gameConfigs = pgTable("game_configs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   envelopeCount: integer("envelope_count").notNull().default(6),
   maxTries: integer("max_tries").notNull().default(3),
+  timerSeconds: integer("timer_seconds").notNull().default(60),
 });
 
 export const envelopes = pgTable("envelopes", {
@@ -25,6 +26,8 @@ export const gameStates = pgTable("game_states", {
   cashedOut: boolean("cashed_out").notNull().default(false),
   finalPrize: text("final_prize"),
   shuffledOrder: text("shuffled_order").array().notNull().default([]),
+  timeRemaining: integer("time_remaining"),
+  gameStartTime: integer("game_start_time"),
 });
 
 export const insertGameConfigSchema = createInsertSchema(gameConfigs).omit({

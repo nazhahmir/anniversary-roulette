@@ -173,13 +173,24 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* Fix modal positioning - center all alert dialogs */
-  [data-radix-alert-dialog-content] {
+  /* Fix modal positioning and sizing */
+  [data-radix-alert-dialog-overlay] {
     position: fixed !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    max-width: 90vw !important;
-    max-height: 90vh !important;
+    inset: 0 !important;
+    z-index: 50 !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  [data-radix-alert-dialog-content] {
+    position: relative !important;
+    max-width: 500px !important;
+    width: 90vw !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
   }
 }

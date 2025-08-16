@@ -11,7 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const config = await storage.getGameConfig();
       if (!config) {
         // Return default config if none exists
-        return res.json({ envelopeCount: 6, maxTries: 3 });
+        return res.json({ envelopeCount: 6, maxTries: 3, timerSeconds: 60 });
       }
       res.json(config);
     } catch (error) {

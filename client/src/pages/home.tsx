@@ -8,11 +8,13 @@ import ConfirmationModal from "@/components/confirmation-modal";
 import CashOutModal from "@/components/cash-out-modal";
 import WelcomeScreen from "@/components/welcome-screen";
 import GameCompleteScreen from "@/components/game-complete-screen";
+import GameTimer from "@/components/game-timer";
+import TimeUpModal from "@/components/time-up-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { GameState, Envelope } from "@shared/schema";
+import type { GameState, Envelope, GameConfig } from "@shared/schema";
 
 interface DisplayEnvelope extends Envelope {
   displayPosition: number;
@@ -23,6 +25,7 @@ export default function Home() {
   const [showResetModal, setShowResetModal] = useState(false);
   const [showFinalModal, setShowFinalModal] = useState(false);
   const [showCashOutModal, setShowCashOutModal] = useState(false);
+  const [showTimeUpModal, setShowTimeUpModal] = useState(false);
   const [selectedEnvelopeForCashOut, setSelectedEnvelopeForCashOut] = useState<string | null>(null);
 
   // Fetch game state
@@ -33,6 +36,11 @@ export default function Home() {
   // Fetch envelopes
   const { data: envelopes = [], isLoading: envelopesLoading } = useQuery<Envelope[]>({
     queryKey: ["/api/envelopes"],
+  });
+
+  // Fetch game config for timer
+  const { data: gameConfig } = useQuery<GameConfig>({
+    queryKey: ["/api/game-config"],
   });
 
   // Select envelope mutation
@@ -176,6 +184,19 @@ export default function Home() {
     setSelectedEnvelopeForCashOut(null);
   };
 
+  const handleTimeUp = () => {
+    // Auto-assign a random unselected envelope as the final prize
+    const unselectedEnvelopes = envelopes.filter(env => !gameState?.selectedEnvelopes.includes(env.id));
+    if (unselectedEnvelopes.length > 0) {
+      const randomEnvelope = unselectedEnvelopes[Math.floor(Math.random() * unselectedEnvelopes.length)];
+      selectEnvelopeMutation.mutate(randomEnvelope.id, {
+        onSuccess: () => {
+          setShowTimeUpModal(true);
+        }
+      });
+    }
+  };
+
   // Get the prize text for the cash-out modal
   const getCashOutPrize = () => {
     if (!selectedEnvelopeForCashOut) return "";
@@ -292,6 +313,16 @@ export default function Home() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Game Timer */}
+          <div className="flex justify-center mb-6">
+            <GameTimer
+              timerSeconds={gameConfig?.timerSeconds || 60}
+              gameStarted={gameState?.gameStarted || false}
+              onTimeUp={handleTimeUp}
+              isGameComplete={gameState?.isGameComplete || false}
+            />
+          </div>
           
           <Button
             onClick={() => setShowResetModal(true)}
@@ -366,6 +397,13 @@ export default function Home() {
         remainingTries={gameState?.remainingTries || 0}
         onCashOut={handleCashOut}
         onContinue={handleContinueGame}
+      />
+
+      {/* Time Up Modal */}
+      <TimeUpModal
+        isOpen={showTimeUpModal}
+        finalPrize={gameState?.finalPrize || ""}
+        onClose={() => setShowTimeUpModal(false)}
       />
     </div>
   );

@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Inbox, Database, Save, CheckCircle, BarChart3, RefreshCw } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Settings, Inbox, Database, Save, CheckCircle, BarChart3, RefreshCw, Clock, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { GameConfig, Envelope as EnvelopeType } from "@shared/schema";
+import { getRandomOptions } from "@shared/prefilled-options";
 
 const pastelColors = ["coral", "mint", "sky", "sage", "warm-yellow", "blush"];
 
@@ -18,6 +20,8 @@ export default function Admin() {
   const { toast } = useToast();
   const [envelopeCount, setEnvelopeCount] = useState(6);
   const [maxTries, setMaxTries] = useState(3);
+  const [timerSeconds, setTimerSeconds] = useState(60);
+  const [usePrefilled, setUsePrefilled] = useState(false);
   const [envelopes, setEnvelopes] = useState<Array<{ position: number; prizeText: string; color: string }>>([]);
 
   // Fetch game config
@@ -35,6 +39,7 @@ export default function Admin() {
     if (gameConfig) {
       setEnvelopeCount(gameConfig.envelopeCount);
       setMaxTries(gameConfig.maxTries);
+      setTimerSeconds(gameConfig.timerSeconds || 60);
     }
   }, [gameConfig]);
 
@@ -82,6 +87,7 @@ export default function Admin() {
       const response = await apiRequest("POST", "/api/game-config", {
         envelopeCount,
         maxTries,
+        timerSeconds,
       });
       return response.json();
     },
@@ -135,6 +141,28 @@ export default function Admin() {
         env.position === position ? { ...env, prizeText } : env
       )
     );
+  };
+
+  const handleUsePrefilled = () => {
+    if (usePrefilled) {
+      const prefilledOptions = getRandomOptions(envelopeCount);
+      setEnvelopes(prev => 
+        prev.map((env, index) => ({
+          ...env,
+          prizeText: prefilledOptions[index]?.prizeText || env.prizeText,
+          color: prefilledOptions[index]?.color || env.color
+        }))
+      );
+      toast({
+        title: "Prefilled Options Applied",
+        description: "Romantic anniversary ideas have been loaded!",
+      });
+    } else {
+      // Clear all prize texts when turning off prefilled
+      setEnvelopes(prev => 
+        prev.map(env => ({ ...env, prizeText: "" }))
+      );
+    }
   };
 
   const getColorClass = (color: string) => {
@@ -205,6 +233,26 @@ export default function Admin() {
                   data-testid="input-max-tries"
                 />
               </div>
+
+              <div>
+                <Label htmlFor="timer-seconds" className="text-sm font-medium text-gray-700 mb-2 flex items-center">
+                  <Clock className="mr-1" size={16} />
+                  Game Timer (seconds)
+                </Label>
+                <Input
+                  id="timer-seconds"
+                  type="number"
+                  min="30"
+                  max="300"
+                  value={timerSeconds}
+                  onChange={(e) => setTimerSeconds(parseInt(e.target.value) || 60)}
+                  className="focus:ring-2 focus:ring-coral focus:border-transparent"
+                  data-testid="input-timer-seconds"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Time limit for the entire game (30-300 seconds)
+                </p>
+              </div>
               
               <Button
                 onClick={() => saveConfigMutation.mutate()}
@@ -231,6 +279,31 @@ export default function Admin() {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blush/20 to-warm-yellow/20 rounded-lg border border-coral/30 mb-4">
+                <div className="flex items-center space-x-3">
+                  <Sparkles className="text-coral" size={20} />
+                  <div>
+                    <Label htmlFor="use-prefilled" className="text-sm font-medium text-gray-700">
+                      Use Romantic Anniversary Ideas
+                    </Label>
+                    <p className="text-xs text-gray-500">
+                      Auto-fill with curated San Francisco Bay Area date ideas
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  id="use-prefilled"
+                  checked={usePrefilled}
+                  onCheckedChange={(checked) => {
+                    setUsePrefilled(checked);
+                    if (checked) {
+                      handleUsePrefilled();
+                    }
+                  }}
+                  data-testid="switch-prefilled"
+                />
+              </div>
+
               <div className="space-y-4 max-h-80 overflow-y-auto">
                 {envelopes.map((envelope, index) => (
                   <div key={`envelope-${envelope.position}-${index}`} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
