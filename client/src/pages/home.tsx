@@ -92,10 +92,6 @@ export default function Home() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/game-state"] });
-      toast({
-        title: "Game Started!",
-        description: "Prizes have been shuffled. Good luck!",
-      });
     },
     onError: (error: any) => {
       toast({

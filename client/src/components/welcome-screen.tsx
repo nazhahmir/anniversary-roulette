@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Heart, Gift, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import NavigationHeader from "@/components/navigation-header";
 import type { Envelope } from "@shared/schema";
 
 interface WelcomeScreenProps {
@@ -14,9 +15,11 @@ export default function WelcomeScreen({ envelopes, onStartGame, onResetGame }: W
   const [showPrizes, setShowPrizes] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blush via-off-white to-mint flex items-center justify-center px-4">
-      <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
-        <CardContent className="p-8 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-blush via-off-white to-mint">
+      <NavigationHeader />
+      <div className="flex items-center justify-center px-4 pt-20">
+        <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
+          <CardContent className="p-8 text-center">
           <div className="mb-8">
             <div className="flex justify-center items-center mb-6">
               <div className="bg-coral p-4 rounded-full">
@@ -99,8 +102,9 @@ export default function WelcomeScreen({ envelopes, onStartGame, onResetGame }: W
               </div>
             </div>
           )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
