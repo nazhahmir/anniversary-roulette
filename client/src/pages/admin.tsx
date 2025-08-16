@@ -11,8 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Settings, Inbox, Database, Save, CheckCircle, BarChart3, RefreshCw, Clock, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { GameConfig, Envelope as EnvelopeType } from "@shared/schema";
-import { getRandomOptions } from "@shared/prefilled-options";
+import type { GameConfig, Envelope as EnvelopeType, RomanticPrize } from "@shared/schema";
 
 const pastelColors = ["coral", "mint", "sky", "sage", "warm-yellow", "blush"];
 
@@ -143,19 +142,55 @@ export default function Admin() {
     );
   };
 
-  const handleUsePrefilled = () => {
-    const prefilledOptions = getRandomOptions(envelopeCount);
-    setEnvelopes(prev => 
-      prev.map((env, index) => ({
-        ...env,
-        prizeText: prefilledOptions[index]?.prizeText || env.prizeText,
-        color: prefilledOptions[index]?.color || env.color
-      }))
-    );
-    toast({
-      title: "Prefilled Options Applied",
-      description: "Romantic anniversary ideas have been loaded!",
-    });
+  // Initialize romantic prizes mutation
+  const initializePrizesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/romantic-prizes/initialize");
+      return response.json();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to initialize romantic prizes",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Get random romantic prizes mutation
+  const getRandomPrizesMutation = useMutation({
+    mutationFn: async (count: number) => {
+      const response = await apiRequest("POST", "/api/romantic-prizes/random", { count });
+      return response.json();
+    },
+    onSuccess: (randomPrizes: RomanticPrize[]) => {
+      const pastelColors = ["coral", "mint", "sky", "sage", "warm-yellow", "blush"];
+      setEnvelopes(prev => 
+        prev.map((env, index) => ({
+          ...env,
+          prizeText: randomPrizes[index]?.prizeText || env.prizeText,
+          color: pastelColors[index % pastelColors.length]
+        }))
+      );
+      toast({
+        title: "Prefilled Options Applied",
+        description: "Romantic anniversary ideas have been loaded!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get random romantic prizes",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleUsePrefilled = async () => {
+    // First initialize the prizes if needed
+    await initializePrizesMutation.mutateAsync();
+    // Then get random prizes for the current envelope count
+    getRandomPrizesMutation.mutate(envelopeCount);
   };
 
   const getColorClass = (color: string) => {

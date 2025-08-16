@@ -178,6 +178,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Romantic Prizes Routes
+  app.get("/api/romantic-prizes", async (req, res) => {
+    try {
+      const prizes = await storage.getRomanticPrizes();
+      res.json(prizes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get romantic prizes" });
+    }
+  });
+
+  app.post("/api/romantic-prizes/initialize", async (req, res) => {
+    try {
+      await storage.initializeRomanticPrizes();
+      res.json({ message: "Romantic prizes initialized successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to initialize romantic prizes" });
+    }
+  });
+
+  app.post("/api/romantic-prizes/random", async (req, res) => {
+    try {
+      const { count } = req.body;
+      if (!count || count < 1) {
+        return res.status(400).json({ message: "Count is required and must be greater than 0" });
+      }
+
+      const randomPrizes = await storage.getRandomRomanticPrizes(count);
+      res.json(randomPrizes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get random romantic prizes" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

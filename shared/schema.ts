@@ -30,6 +30,13 @@ export const gameStates = pgTable("game_states", {
   gameStartTime: integer("game_start_time"),
 });
 
+export const romanticPrizes = pgTable("romantic_prizes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  prizeText: text("prize_text").notNull(),
+  category: text("category").notNull(), // e.g., "weekend-getaway", "dining", "cultural", "scenic"
+  isActive: boolean("is_active").notNull().default(true),
+});
+
 export const insertGameConfigSchema = createInsertSchema(gameConfigs).omit({
   id: true,
 });
@@ -42,6 +49,10 @@ export const insertGameStateSchema = createInsertSchema(gameStates).omit({
   id: true,
 });
 
+export const insertRomanticPrizeSchema = createInsertSchema(romanticPrizes).omit({
+  id: true,
+});
+
 export type InsertGameConfig = z.infer<typeof insertGameConfigSchema>;
 export type GameConfig = typeof gameConfigs.$inferSelect;
 
@@ -50,6 +61,9 @@ export type Envelope = typeof envelopes.$inferSelect;
 
 export type InsertGameState = z.infer<typeof insertGameStateSchema>;
 export type GameState = typeof gameStates.$inferSelect;
+
+export type InsertRomanticPrize = z.infer<typeof insertRomanticPrizeSchema>;
+export type RomanticPrize = typeof romanticPrizes.$inferSelect;
 
 // Legacy user schema (keeping for compatibility)
 export const users = pgTable("users", {
