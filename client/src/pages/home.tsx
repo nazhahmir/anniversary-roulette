@@ -14,6 +14,10 @@ import { RotateCcw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { GameState, Envelope } from "@shared/schema";
 
+interface DisplayEnvelope extends Envelope {
+  displayPosition: number;
+}
+
 export default function Home() {
   const { toast } = useToast();
   const [showResetModal, setShowResetModal] = useState(false);
@@ -183,16 +187,24 @@ export default function Home() {
     return envelope?.prizeText || "";
   };
 
-  // Organize envelopes in shuffled order if game has started
-  const getOrderedEnvelopes = () => {
+  // Create display envelopes with shuffled prizes but static positions
+  const getDisplayEnvelopes = (): DisplayEnvelope[] => {
     if (!gameState?.gameStarted || !gameState.shuffledOrder.length) {
-      return envelopes;
+      return envelopes.map((envelope, index) => ({
+        ...envelope,
+        displayPosition: index + 1
+      }));
     }
     
-    // Return envelopes in the shuffled order
-    return gameState.shuffledOrder
+    // Create envelopes with static positions but shuffled prize content
+    const shuffledEnvelopes = gameState.shuffledOrder
       .map(id => envelopes.find(e => e.id === id))
       .filter(Boolean) as Envelope[];
+    
+    return shuffledEnvelopes.map((envelope, index) => ({
+      ...envelope,
+      displayPosition: index + 1
+    }));
   };
 
   if (gameStateLoading || envelopesLoading) {
@@ -246,7 +258,7 @@ export default function Home() {
     );
   }
 
-  const orderedEnvelopes = getOrderedEnvelopes();
+  const displayEnvelopes = getDisplayEnvelopes();
 
   return (
     <div className="min-h-screen bg-off-white">
@@ -297,11 +309,11 @@ export default function Home() {
 
         {/* Envelopes Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          {orderedEnvelopes.map((envelope) => (
+          {displayEnvelopes.map((envelope) => (
             <EnvelopeCard
               key={envelope.id}
               id={envelope.id}
-              position={envelope.position}
+              position={envelope.displayPosition}
               prizeText={envelope.prizeText}
               color={envelope.color}
               isFlipped={gameState?.selectedEnvelopes.includes(envelope.id) || false}
