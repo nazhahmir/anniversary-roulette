@@ -5,6 +5,9 @@ import { apiRequest } from "@/lib/queryClient";
 import NavigationHeader from "@/components/navigation-header";
 import EnvelopeCard from "@/components/envelope-card";
 import ConfirmationModal from "@/components/confirmation-modal";
+import CashOutModal from "@/components/cash-out-modal";
+import WelcomeScreen from "@/components/welcome-screen";
+import GameCompleteScreen from "@/components/game-complete-screen";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RotateCcw } from "lucide-react";
@@ -15,6 +18,8 @@ export default function Home() {
   const { toast } = useToast();
   const [showResetModal, setShowResetModal] = useState(false);
   const [showFinalModal, setShowFinalModal] = useState(false);
+  const [showCashOutModal, setShowCashOutModal] = useState(false);
+  const [selectedEnvelopeForCashOut, setSelectedEnvelopeForCashOut] = useState<string | null>(null);
 
   // Fetch game state
   const { data: gameState, isLoading: gameStateLoading } = useQuery<GameState>({
@@ -62,7 +67,7 @@ export default function Home() {
       queryClient.invalidateQueries({ queryKey: ["/api/game-state"] });
       toast({
         title: "Game Reset",
-        description: "Starting a new game. Good luck!",
+        description: "Setup cleared. Configure your prizes in the admin panel!",
       });
       setShowResetModal(false);
     },
@@ -70,6 +75,54 @@ export default function Home() {
       toast({
         title: "Error",
         description: error.message || "Failed to reset game",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Start game mutation
+  const startGameMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/game-state/start");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/game-state"] });
+      toast({
+        title: "Game Started!",
+        description: "Prizes have been shuffled. Good luck!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start game",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Cash out mutation
+  const cashOutMutation = useMutation({
+    mutationFn: async (envelopeId: string) => {
+      const response = await apiRequest("POST", "/api/game-state/cash-out", {
+        envelopeId,
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/game-state"] });
+      setShowCashOutModal(false);
+      setSelectedEnvelopeForCashOut(null);
+      toast({
+        title: "Congratulations!",
+        description: "You've cashed out with your prize!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to cash out",
         variant: "destructive",
       });
     },
@@ -84,7 +137,16 @@ export default function Home() {
       return;
     }
     
-    selectEnvelopeMutation.mutate(envelopeId);
+    // Select the envelope first
+    selectEnvelopeMutation.mutate(envelopeId, {
+      onSuccess: () => {
+        // After selection, show cash out modal if there are tries remaining
+        if (gameState.remainingTries > 1) {
+          setSelectedEnvelopeForCashOut(envelopeId);
+          setShowCashOutModal(true);
+        }
+      }
+    });
   };
 
   const handleConfirmFinalSelection = () => {
@@ -99,6 +161,40 @@ export default function Home() {
     resetGameMutation.mutate();
   };
 
+  const handleStartGame = () => {
+    startGameMutation.mutate();
+  };
+
+  const handleCashOut = () => {
+    if (selectedEnvelopeForCashOut) {
+      cashOutMutation.mutate(selectedEnvelopeForCashOut);
+    }
+  };
+
+  const handleContinueGame = () => {
+    setShowCashOutModal(false);
+    setSelectedEnvelopeForCashOut(null);
+  };
+
+  // Get the prize text for the cash-out modal
+  const getCashOutPrize = () => {
+    if (!selectedEnvelopeForCashOut) return "";
+    const envelope = envelopes.find(e => e.id === selectedEnvelopeForCashOut);
+    return envelope?.prizeText || "";
+  };
+
+  // Organize envelopes in shuffled order if game has started
+  const getOrderedEnvelopes = () => {
+    if (!gameState?.gameStarted || !gameState.shuffledOrder.length) {
+      return envelopes;
+    }
+    
+    // Return envelopes in the shuffled order
+    return gameState.shuffledOrder
+      .map(id => envelopes.find(e => e.id === id))
+      .filter(Boolean) as Envelope[];
+  };
+
   if (gameStateLoading || envelopesLoading) {
     return (
       <div className="min-h-screen bg-off-white">
@@ -111,6 +207,46 @@ export default function Home() {
       </div>
     );
   }
+
+  // Show welcome screen if game hasn't started or no envelopes configured
+  if (!gameState?.gameStarted || envelopes.length === 0) {
+    if (envelopes.length === 0) {
+      return (
+        <div className="min-h-screen bg-off-white">
+          <NavigationHeader />
+          <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-dark-blue mb-4">No Prizes Configured</h1>
+              <p className="text-gray-600 mb-6">
+                Please go to the Admin Panel to set up your prizes before starting the game.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <WelcomeScreen 
+        envelopes={envelopes}
+        onStartGame={handleStartGame}
+        onResetGame={handleResetGame}
+      />
+    );
+  }
+
+  // Show game completion screen if game is complete
+  if (gameState?.isGameComplete && (gameState.finalPrize || gameState.cashedOut)) {
+    return (
+      <GameCompleteScreen
+        finalPrize={gameState.finalPrize || ""}
+        cashedOut={gameState.cashedOut}
+        onPlayAgain={handleResetGame}
+      />
+    );
+  }
+
+  const orderedEnvelopes = getOrderedEnvelopes();
 
   return (
     <div className="min-h-screen bg-off-white">
@@ -161,7 +297,7 @@ export default function Home() {
 
         {/* Envelopes Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
-          {envelopes.map((envelope) => (
+          {orderedEnvelopes.map((envelope) => (
             <EnvelopeCard
               key={envelope.id}
               id={envelope.id}
@@ -213,6 +349,15 @@ export default function Home() {
         message="This is your last try! Are you ready to make your final choice?"
         onConfirm={handleConfirmFinalSelection}
         onCancel={() => setShowFinalModal(false)}
+      />
+
+      {/* Cash Out Modal */}
+      <CashOutModal
+        isOpen={showCashOutModal}
+        prizeText={getCashOutPrize()}
+        remainingTries={gameState?.remainingTries || 0}
+        onCashOut={handleCashOut}
+        onContinue={handleContinueGame}
       />
     </div>
   );

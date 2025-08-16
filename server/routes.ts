@@ -116,10 +116,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newRemainingTries = currentState.remainingTries - 1;
       const isGameComplete = newRemainingTries <= 0;
 
+      let finalPrize = currentState.finalPrize;
+      
+      // If this is the last try, automatically assign the final prize
+      if (isGameComplete && currentState.shuffledOrder.length > 0) {
+        const envelopes = await storage.getAllEnvelopes();
+        const remainingEnvelopeIds = currentState.shuffledOrder.filter(id => !newSelectedEnvelopes.includes(id));
+        if (remainingEnvelopeIds.length > 0) {
+          const finalEnvelope = envelopes.find(e => e.id === remainingEnvelopeIds[0]);
+          if (finalEnvelope) {
+            finalPrize = finalEnvelope.prizeText;
+          }
+        }
+      }
+
       const updatedState = await storage.createOrUpdateGameState({
         selectedEnvelopes: newSelectedEnvelopes,
         remainingTries: newRemainingTries,
         isGameComplete,
+        gameStarted: currentState.gameStarted,
+        cashedOut: currentState.cashedOut,
+        finalPrize,
+        shuffledOrder: currentState.shuffledOrder,
       });
 
       res.json(updatedState);
@@ -134,6 +152,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(resetState);
     } catch (error) {
       res.status(500).json({ message: "Failed to reset game state" });
+    }
+  });
+
+  app.post("/api/game-state/start", async (req, res) => {
+    try {
+      const gameState = await storage.startGame();
+      res.json(gameState);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to start game" });
+    }
+  });
+
+  app.post("/api/game-state/cash-out", async (req, res) => {
+    try {
+      const { envelopeId } = req.body;
+      if (!envelopeId) {
+        return res.status(400).json({ message: "Envelope ID is required" });
+      }
+
+      const gameState = await storage.cashOut(envelopeId);
+      res.json(gameState);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to cash out" });
     }
   });
 

@@ -21,6 +21,10 @@ export const gameStates = pgTable("game_states", {
   selectedEnvelopes: text("selected_envelopes").array().notNull().default([]),
   remainingTries: integer("remaining_tries").notNull(),
   isGameComplete: boolean("is_game_complete").notNull().default(false),
+  gameStarted: boolean("game_started").notNull().default(false),
+  cashedOut: boolean("cashed_out").notNull().default(false),
+  finalPrize: text("final_prize"),
+  shuffledOrder: text("shuffled_order").array().notNull().default([]),
 });
 
 export const insertGameConfigSchema = createInsertSchema(gameConfigs).omit({

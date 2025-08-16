@@ -232,8 +232,8 @@ export default function Admin() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4 max-h-80 overflow-y-auto">
-                {envelopes.map((envelope) => (
-                  <div key={envelope.position} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                {envelopes.map((envelope, index) => (
+                  <div key={`envelope-${envelope.position}-${index}`} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                     <div className={`w-8 h-8 ${getColorClass(envelope.color)} rounded-full flex items-center justify-center text-white font-semibold text-sm`}>
                       {envelope.position}
                     </div>

@@ -35,6 +35,8 @@ export interface IStorage {
   getCurrentGameState(): Promise<GameState | undefined>;
   createOrUpdateGameState(state: InsertGameState): Promise<GameState>;
   resetGameState(): Promise<GameState>;
+  startGame(): Promise<GameState>;
+  cashOut(envelopeId: string): Promise<GameState>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -123,6 +125,52 @@ export class DatabaseStorage implements IStorage {
       selectedEnvelopes: [],
       remainingTries: maxTries,
       isGameComplete: false,
+      gameStarted: false,
+      cashedOut: false,
+      finalPrize: undefined,
+      shuffledOrder: [],
+    });
+  }
+
+  async startGame(): Promise<GameState> {
+    const config = await this.getGameConfig();
+    const maxTries = config?.maxTries || 3;
+    const envelopes = await this.getAllEnvelopes();
+    
+    // Shuffle the envelope IDs to randomize prizes
+    const shuffledOrder = [...envelopes.map(e => e.id)].sort(() => Math.random() - 0.5);
+    
+    return this.createOrUpdateGameState({
+      selectedEnvelopes: [],
+      remainingTries: maxTries,
+      isGameComplete: false,
+      gameStarted: true,
+      cashedOut: false,
+      finalPrize: undefined,
+      shuffledOrder,
+    });
+  }
+
+  async cashOut(envelopeId: string): Promise<GameState> {
+    const currentState = await this.getCurrentGameState();
+    if (!currentState) {
+      throw new Error("No active game state");
+    }
+
+    const envelopes = await this.getAllEnvelopes();
+    const envelope = envelopes.find(e => e.id === envelopeId);
+    if (!envelope) {
+      throw new Error("Envelope not found");
+    }
+
+    return this.createOrUpdateGameState({
+      selectedEnvelopes: currentState.selectedEnvelopes,
+      remainingTries: currentState.remainingTries,
+      isGameComplete: true,
+      gameStarted: currentState.gameStarted,
+      cashedOut: true,
+      finalPrize: envelope.prizeText,
+      shuffledOrder: currentState.shuffledOrder,
     });
   }
 }
