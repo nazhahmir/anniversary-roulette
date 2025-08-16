@@ -37,17 +37,17 @@ export default function CashOutModal({
           <AlertDialogTitle className="text-center text-2xl font-bold text-dark-blue" data-testid="modal-title">
             Deal or No Deal?
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-center space-y-3" data-testid="modal-message">
-            <div className="bg-gradient-to-r from-mint/20 to-sky/20 p-4 rounded-lg border border-mint/30">
-              <p className="text-lg font-semibold text-dark-blue">You revealed:</p>
-              <p className="text-xl font-bold text-coral">{prizeText}</p>
+          <AlertDialogDescription className="text-center" data-testid="modal-message">
+            <div className="bg-gradient-to-r from-mint/20 to-sky/20 p-4 rounded-lg border border-mint/30 mb-4">
+              <div className="text-lg font-semibold text-dark-blue">You revealed:</div>
+              <div className="text-xl font-bold text-coral">{prizeText}</div>
             </div>
-            <p className="text-gray-600">
+            <div className="text-gray-600 mb-3">
               You have <span className="font-bold text-coral">{remainingTries}</span> {remainingTries === 1 ? 'try' : 'tries'} remaining.
-            </p>
-            <p className="text-gray-600">
+            </div>
+            <div className="text-gray-600">
               Do you want to <span className="font-bold">cash out</span> with this prize, or <span className="font-bold">continue playing</span> for a chance at something better?
-            </p>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col sm:flex-row gap-3">
