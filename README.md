@@ -4,10 +4,12 @@ A modern web-based "Deal or No Deal" anniversary gift game built with React, Typ
 
 ## Features
 
-- **Interactive Welcome Screen** - Prize preview with the game name "Anniversary Surprise"
+- **Interactive Welcome Screen** - Prize preview with the game name "Jam's Anniversary Surprise"
 - **Randomized Envelope Selection** - Shuffled prize distribution for unpredictability
 - **Cash-Out System** - "Deal or No Deal" decisions after each envelope selection
-- **Automatic Final Prize** - Remaining prize assignment when tries are exhausted
+- **Automatic Final Prize** - Last selected envelope becomes final prize when tries are exhausted
+- **Time's Up Modal** - Special modal appears when timer expires
+- **Celebratory Confetti** - 6-second confetti animation on game completion
 - **Admin Panel** - Complete game configuration and envelope management
 - **Beautiful Pastel UI** - Custom color palette (coral, mint, sky, sage, warm-yellow, blush)
 - **Mobile Responsive** - Optimized for all device sizes
@@ -110,7 +112,9 @@ anniversary-roulette/
 2. **Game Start** - Envelopes are shuffled and game timer begins
 3. **Envelope Selection** - Players select envelopes one by one
 4. **Cash-Out Decision** - After each selection, players can cash out or continue
-5. **Game Completion** - Final prize assignment or cash-out completion
+5. **Game Completion** - Either:
+   - **Final try**: Directly shows Game Complete screen with confetti
+   - **Time expires**: Shows Time's Up modal, then Game Complete screen with confetti
 6. **Reset** - Return to welcome screen for new games
 
 ## Available Scripts
@@ -124,8 +128,10 @@ anniversary-roulette/
 ## Customization
 
 ### Colors
-The game uses a custom pastel color palette defined in Tailwind config:
-- Coral, Mint, Sky, Sage, Warm-yellow, Blush
+The game uses a custom pastel color palette with solid colors (no gradients):
+- **Envelope colors**: Coral, Mint, Sky, Sage, Warm-yellow, Blush
+- **Background**: Light pink throughout the game
+- **Text contrast**: Darker variants for better readability on white backgrounds
 
 ### Prizes
 Edit `shared/prefilled-options.ts` to customize:
@@ -159,39 +165,42 @@ Configure via admin panel or database:
 - `GET /api/envelopes` - Get all envelopes
 - `POST /api/envelopes` - Create/update envelopes
 - `GET /api/game-state` - Get current game state
-- `POST /api/game-state` - Update game state
-- `POST /api/select-envelope` - Select an envelope
-- `POST /api/cash-out` - Cash out from game
-- `POST /api/reset-game` - Reset game to initial state
+- `POST /api/game-state/select-envelope` - Select an envelope
+- `POST /api/game-state/cash-out` - Cash out from game
+- `POST /api/game-state/time-up` - Complete game when timer expires
+- `POST /api/game-state/reset` - Reset game to initial state
+- `POST /api/game-state/start` - Start a new game
 
-## What We've Accomplished
+## Key Features
 
 ### Database Setup
-We successfully set up a PostgreSQL database using **Neon** (neon.tech) and initialized it with:
-- ✅ **Romantic prizes** - 30+ Bay Area anniversary activities
-- ✅ **Game configuration** - 6 envelopes, 3 tries, 60-second timer
-- ✅ **Initial game state** - Ready to play
-- ✅ **Database schema** - All tables created and populated
+I successfully set up a PostgreSQL database using **Neon** (neon.tech) and initialized it with:
+- **Romantic prizes** - 30+ Bay Area anniversary activities
+- **Game configuration** - 6 envelopes, 3 tries, 60-second timer
+- **Initial game state** - Ready to play
+- **Database schema** - All tables created and populated
 
 ### Development Environment
-- ✅ **Dependencies installed** - All npm packages working
-- ✅ **Environment variables** - `.env` file configured with Neon database
-- ✅ **Server running** - Development server on port 4000
-- ✅ **Database connected** - Successfully connected to Neon PostgreSQL
+- **Dependencies installed** - All npm packages working
+- **Environment variables** - `.env` file configured with Neon database
+- **Server running** - Development server on port 4000
+- **Database connected** - Successfully connected to Neon PostgreSQL
 
 ### Game Features Working
-- ✅ **Welcome screen** - "Anniversary Surprise" with prize preview
-- ✅ **Envelope selection** - 6 envelopes with romantic prizes
-- ✅ **Cash-out system** - "Deal or No Deal" decisions
-- ✅ **Timer functionality** - 60-second countdown
-- ✅ **Game completion** - Prize screen when timer runs out
-- ✅ **Admin panel** - Available at `/admin` for configuration
+- **Welcome screen** - "Jam's Anniversary Surprise" with prize preview
+- **Envelope selection** - 6 envelopes with romantic prizes
+- **Cash-out system** - "Deal or No Deal" decisions
+- **Timer functionality** - 60-second countdown
+- **Time's Up modal** - Appears when timer expires
+- **Game completion** - Last selected envelope becomes final prize with confetti celebration
+- **Admin panel** - Available at `/admin` for configuration
 
 ### UI Improvements Made
-- ✅ **Modal layouts** - Fixed centering and text wrapping
-- ✅ **Responsive design** - Works on mobile and desktop
-- ✅ **Pastel color scheme** - Coral, mint, sky, sage, warm-yellow, blush
-- ✅ **Smooth animations** - Envelope flips and transitions
+- **Solid pastel colors** - Soft pastel envelope colors
+- **Light pink background** - Consistent throughout the game
+- **Responsive design** - Works on mobile and desktop
+- **Smooth animations** - Envelope flips and transitions
+- **Celebratory confetti** - 6-second falling confetti animation on game completion
 
 ## Running the Game
 

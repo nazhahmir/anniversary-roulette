@@ -31,7 +31,7 @@ export const ROMANTIC_ANNIVERSARY_OPTIONS = [
   "Private dance lesson: salsa, swing, or ballroom",
   "California Academy of Sciences NightLife with planetarium shows",
   "Candlelight classical concert at St. Ignatius Church",
-  "Wine tasting tour through Sonoma County vineyards",
+  "Sonoma County olive oil tasting and farm tour",
   
   // Unique Activities
   "Church of 8 Wheels: adults-only roller disco in converted church",
@@ -51,13 +51,26 @@ export const ENVELOPE_COLORS = [
   "coral", "mint", "sky", "sage", "warm-yellow", "blush"
 ];
 
+// Helper function to get colors in a specific order to avoid adjacent same colors
+export function getOrderedColors(count: number): string[] {
+  const colors = [...ENVELOPE_COLORS];
+  const result: string[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    result.push(colors[i % colors.length]);
+  }
+  
+  return result;
+}
+
 // Helper function to get a random selection of options
 export function getRandomOptions(count: number): Array<{prizeText: string, color: string}> {
   const shuffled = [...ROMANTIC_ANNIVERSARY_OPTIONS].sort(() => 0.5 - Math.random());
   const selected = shuffled.slice(0, count);
+  const orderedColors = getOrderedColors(count);
   
   return selected.map((prizeText, index) => ({
     prizeText,
-    color: ENVELOPE_COLORS[index % ENVELOPE_COLORS.length]
+    color: orderedColors[index]
   }));
 }

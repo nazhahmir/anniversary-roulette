@@ -182,6 +182,23 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
+  async timeUp(finalPrize: string): Promise<GameState> {
+    const currentState = await this.getCurrentGameState();
+    if (!currentState) {
+      throw new Error("No active game state");
+    }
+
+    return this.createOrUpdateGameState({
+      selectedEnvelopes: currentState.selectedEnvelopes,
+      remainingTries: currentState.remainingTries,
+      isGameComplete: true,
+      gameStarted: currentState.gameStarted,
+      cashedOut: false,
+      finalPrize: finalPrize,
+      shuffledOrder: currentState.shuffledOrder,
+    });
+  }
+
   // Romantic prizes methods
   async getRomanticPrizes(): Promise<RomanticPrize[]> {
     return await db.select().from(romanticPrizes).where(eq(romanticPrizes.isActive, true));

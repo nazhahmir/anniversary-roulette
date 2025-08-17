@@ -11,11 +11,10 @@ import { Clock, Gift } from "lucide-react";
 
 interface TimeUpModalProps {
   isOpen: boolean;
-  finalPrize: string;
   onClose: () => void;
 }
 
-export default function TimeUpModal({ isOpen, finalPrize, onClose }: TimeUpModalProps) {
+export default function TimeUpModal({ isOpen, onClose }: TimeUpModalProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent className="max-w-2xl mx-auto w-[95vw] max-h-[90vh] overflow-y-auto bg-white" data-testid="time-up-modal">
@@ -29,15 +28,8 @@ export default function TimeUpModal({ isOpen, finalPrize, onClose }: TimeUpModal
             Time's Up!
           </AlertDialogTitle>
           <AlertDialogDescription className="text-center" data-testid="modal-message">
-            <div className="bg-gradient-to-r from-mint/20 to-sky/20 p-4 rounded-lg border border-mint/30 mb-4">
-              <div className="flex items-center justify-center space-x-2 mb-2">
-                <Gift className="text-coral" size={20} />
-                <div className="text-lg font-semibold text-dark-blue">Your Anniversary Prize:</div>
-              </div>
-              <div className="text-lg font-bold text-coral break-words leading-relaxed">{finalPrize}</div>
-            </div>
             <div className="text-gray-600 leading-relaxed">
-              The timer ran out, but don't worry! The system has automatically selected a wonderful anniversary surprise for you.
+              Time's up! Your last selected envelope becomes your final prize. Congratulations on your anniversary surprise!
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

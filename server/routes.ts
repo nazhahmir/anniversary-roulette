@@ -118,15 +118,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let finalPrize = currentState.finalPrize;
       
-      // If this is the last try, automatically assign the final prize
-      if (isGameComplete && currentState.shuffledOrder.length > 0) {
+      // If this is the last try, the selected envelope becomes the final prize
+      if (isGameComplete) {
         const envelopes = await storage.getAllEnvelopes();
-        const remainingEnvelopeIds = currentState.shuffledOrder.filter(id => !newSelectedEnvelopes.includes(id));
-        if (remainingEnvelopeIds.length > 0) {
-          const finalEnvelope = envelopes.find(e => e.id === remainingEnvelopeIds[0]);
-          if (finalEnvelope) {
-            finalPrize = finalEnvelope.prizeText;
-          }
+        const selectedEnvelope = envelopes.find(e => e.id === envelopeId);
+        if (selectedEnvelope) {
+          finalPrize = selectedEnvelope.prizeText;
         }
       }
 
@@ -175,6 +172,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(gameState);
     } catch (error) {
       res.status(500).json({ message: "Failed to cash out" });
+    }
+  });
+
+  app.post("/api/game-state/time-up", async (req, res) => {
+    try {
+      const { finalPrize } = req.body;
+      if (!finalPrize) {
+        return res.status(400).json({ message: "Final prize is required" });
+      }
+
+      const gameState = await storage.timeUp(finalPrize);
+      res.json(gameState);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to complete game on time up" });
     }
   });
 

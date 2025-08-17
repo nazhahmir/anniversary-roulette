@@ -136,6 +136,27 @@ export default function Home() {
     },
   });
 
+  // Time up mutation
+  const timeUpMutation = useMutation({
+    mutationFn: async (finalPrize: string) => {
+      const response = await apiRequest("POST", "/api/game-state/time-up", {
+        finalPrize
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/game-state"] });
+      // The GameCompleteScreen will show since isGameComplete is true
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to complete game",
+        variant: "destructive",
+      });
+    }
+  });
+
   const handleEnvelopeClick = (envelopeId: string) => {
     if (!gameState) return;
     
@@ -185,15 +206,17 @@ export default function Home() {
   };
 
   const handleTimeUp = () => {
-    // Auto-assign a random unselected envelope as the final prize
-    const unselectedEnvelopes = envelopes.filter(env => !gameState?.selectedEnvelopes.includes(env.id));
-    if (unselectedEnvelopes.length > 0) {
-      const randomEnvelope = unselectedEnvelopes[Math.floor(Math.random() * unselectedEnvelopes.length)];
-      selectEnvelopeMutation.mutate(randomEnvelope.id, {
-        onSuccess: () => {
-          setShowTimeUpModal(true);
-        }
-      });
+    // When time runs out, the last selected envelope becomes the final prize
+    if (gameState && gameState.selectedEnvelopes && gameState.selectedEnvelopes.length > 0) {
+      const lastSelectedEnvelopeId = gameState.selectedEnvelopes[gameState.selectedEnvelopes.length - 1];
+      const lastSelectedEnvelope = envelopes.find(env => env.id === lastSelectedEnvelopeId);
+      
+      if (lastSelectedEnvelope) {
+        // Show the Time's Up modal
+        setShowTimeUpModal(true);
+        // Complete the game with the last selected envelope's prize
+        timeUpMutation.mutate(lastSelectedEnvelope.prizeText);
+      }
     }
   };
 
@@ -209,7 +232,8 @@ export default function Home() {
     if (!gameState?.gameStarted || !gameState.shuffledOrder.length) {
       return envelopes.map((envelope, index) => ({
         ...envelope,
-        displayPosition: index + 1
+        displayPosition: index + 1,
+        color: ["coral", "mint", "sky", "sage", "warm-yellow", "blush"][index % 6]
       }));
     }
     
@@ -220,13 +244,14 @@ export default function Home() {
     
     return shuffledEnvelopes.map((envelope, index) => ({
       ...envelope,
-      displayPosition: index + 1
+      displayPosition: index + 1,
+      color: ["coral", "mint", "sky", "sage", "warm-yellow", "blush"][index % 6]
     }));
   };
 
   if (gameStateLoading || envelopesLoading) {
     return (
-      <div className="min-h-screen bg-off-white">
+      <div className="min-h-screen bg-light-pink">
         <NavigationHeader />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <div className="text-center">
@@ -241,7 +266,7 @@ export default function Home() {
   if (!gameState?.gameStarted || envelopes.length === 0) {
     if (envelopes.length === 0) {
       return (
-        <div className="min-h-screen bg-off-white">
+        <div className="min-h-screen bg-light-pink">
           <NavigationHeader />
           <div className="container mx-auto px-4 py-8 max-w-4xl">
             <div className="text-center">
@@ -265,7 +290,7 @@ export default function Home() {
   }
 
   // Show game completion screen if game is complete
-  if (gameState?.isGameComplete) {
+  if (gameState?.isGameComplete && !showTimeUpModal) {
     return (
       <GameCompleteScreen
         finalPrize={gameState.finalPrize || "A wonderful anniversary surprise!"}
@@ -277,8 +302,48 @@ export default function Home() {
 
   const displayEnvelopes = getDisplayEnvelopes();
 
+  // Calculate optimal grid layout
+  const calculateGridLayout = (envelopeCount: number) => {
+    if (envelopeCount <= 0) return { cols: 1, rows: 1 };
+    
+    // For 6 envelopes: 2x3, for 10: 2x5, for 12: 3x4
+    if (envelopeCount === 6) return { cols: 3, rows: 2 };
+    if (envelopeCount === 10) return { cols: 5, rows: 2 };
+    if (envelopeCount === 12) return { cols: 4, rows: 3 };
+    
+    // For other counts, find the closest square root and distribute evenly
+    const sqrt = Math.sqrt(envelopeCount);
+    const cols = Math.ceil(sqrt);
+    const rows = Math.ceil(envelopeCount / cols);
+    
+    return { cols, rows };
+  };
+
+  const gridLayout = calculateGridLayout(displayEnvelopes.length);
+  
+  // Map column counts to Tailwind classes
+  const getGridColsClass = (cols: number) => {
+    const gridMap: Record<number, string> = {
+      1: 'grid-cols-1',
+      2: 'grid-cols-2', 
+      3: 'grid-cols-3',
+      4: 'grid-cols-4',
+      5: 'grid-cols-5',
+      6: 'grid-cols-6',
+      7: 'grid-cols-7',
+      8: 'grid-cols-8',
+      9: 'grid-cols-9',
+      10: 'grid-cols-10',
+      11: 'grid-cols-11',
+      12: 'grid-cols-12'
+    };
+    return gridMap[cols] || 'grid-cols-3';
+  };
+  
+  const gridColsClass = getGridColsClass(gridLayout.cols);
+
   return (
-    <div className="min-h-screen bg-off-white">
+    <div className="min-h-screen bg-light-pink">
       <NavigationHeader />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -335,7 +400,7 @@ export default function Home() {
         </div>
 
         {/* Envelopes Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div className={`grid ${gridColsClass} gap-4 md:gap-6 mb-8`}>
           {displayEnvelopes.map((envelope) => (
             <EnvelopeCard
               key={envelope.id}
@@ -402,10 +467,9 @@ export default function Home() {
       {/* Time Up Modal */}
       <TimeUpModal
         isOpen={showTimeUpModal}
-        finalPrize={gameState?.finalPrize || "A wonderful anniversary surprise!"}
         onClose={() => {
           setShowTimeUpModal(false);
-          // The game should already be complete at this point, so the GameCompleteScreen will show
+          // The GameCompleteScreen will show since isGameComplete is true
         }}
       />
     </div>

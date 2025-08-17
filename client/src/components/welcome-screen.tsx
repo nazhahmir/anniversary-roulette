@@ -15,26 +15,22 @@ export default function WelcomeScreen({ envelopes, onStartGame, onResetGame }: W
   const [showPrizes, setShowPrizes] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blush via-off-white to-mint">
+    <div className="min-h-screen bg-light-pink">
       <NavigationHeader />
       <div className="flex items-center justify-center px-4 pt-20">
         <Card className="w-full max-w-2xl shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardContent className="p-8 text-center">
-          <div className="mb-8">
-            <div className="flex justify-center items-center mb-6">
-              <div className="bg-coral p-4 rounded-full">
-                <Heart className="text-white pulse-heart" size={48} />
-              </div>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-dark-blue mb-4">
-              Anniversary Surprise
-            </h1>
-            
-            <p className="text-xl text-gray-600 mb-6">
-              A special Deal or No Deal game just for you! 
-              Pick envelopes to discover wonderful anniversary gifts.
-            </p>
+            <div className="mb-6">
+              <Heart className="w-16 h-16 text-coral mx-auto mb-4 animate-pulse" />
+              
+              <h1 className="text-4xl md:text-5xl font-bold text-dark-blue mb-4">
+                Jam's Anniversary Surprise
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-6">
+                A special Deal or No Deal game just for you! 
+                Pick envelopes to discover wonderful anniversary gifts.
+              </p>
             
             <div className="flex items-center justify-center space-x-2 mb-8">
               <Sparkles className="text-warm-yellow" size={20} />

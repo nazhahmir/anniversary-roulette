@@ -12,12 +12,12 @@ interface EnvelopeCardProps {
 }
 
 const colorMap: Record<string, string> = {
-  coral: "from-coral to-pink-400",
-  mint: "from-mint to-teal-400", 
-  sky: "from-sky to-blue-400",
-  sage: "from-sage to-green-400",
-  "warm-yellow": "from-warm-yellow to-yellow-400",
-  blush: "from-blush to-pink-300",
+  coral: "bg-coral",
+  mint: "bg-mint", 
+  sky: "bg-sky",
+  sage: "bg-sage",
+  "warm-yellow": "bg-warm-yellow",
+  blush: "bg-blush",
 };
 
 const borderColorMap: Record<string, string> = {
@@ -30,12 +30,12 @@ const borderColorMap: Record<string, string> = {
 };
 
 const textColorMap: Record<string, string> = {
-  coral: "text-coral",
-  mint: "text-mint",
-  sky: "text-sky",
-  sage: "text-sage", 
-  "warm-yellow": "text-warm-yellow",
-  blush: "text-blush",
+  coral: "text-coral-dark",
+  mint: "text-mint-dark",
+  sky: "text-sky-dark",
+  sage: "text-sage-dark", 
+  "warm-yellow": "text-warm-yellow-dark",
+  blush: "text-blush-dark",
 };
 
 export default function EnvelopeCard({ 
@@ -47,30 +47,29 @@ export default function EnvelopeCard({
   isDisabled, 
   onClick 
 }: EnvelopeCardProps) {
-  const gradientClass = colorMap[color] || "from-gray-400 to-gray-500";
+  const solidColorClass = colorMap[color] || "bg-gray-400";
   const borderClass = borderColorMap[color] || "border-gray-400";
   const textClass = textColorMap[color] || "text-gray-600";
 
   return (
     <motion.div
-      className={`envelope-card h-32 md:h-40 ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${isFlipped ? 'flipped' : ''}`}
+      className={`envelope-card h-28 sm:h-32 md:h-36 lg:h-40 ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'} ${isFlipped ? 'flipped' : ''}`}
       onClick={isDisabled ? undefined : onClick}
       whileHover={isDisabled ? {} : { y: -4 }}
       data-testid={`envelope-card-${position}`}
     >
       <div className="envelope-inner">
-        <div className={`envelope-front bg-gradient-to-br ${gradientClass} shadow-lg`}>
+        <div className={`envelope-front ${solidColorClass} shadow-lg`}>
           <Heart 
-            className="text-white pulse-heart" 
-            size={32}
+            className="text-white pulse-heart w-6 h-6 sm:w-8 sm:h-8" 
             data-testid={`heart-${position}`}
           />
-          <span className="text-white font-semibold mt-2" data-testid={`envelope-number-${position}`}>
+          <span className="text-white font-semibold mt-1 sm:mt-2 text-sm sm:text-base" data-testid={`envelope-number-${position}`}>
             {position}
           </span>
         </div>
         <div className={`envelope-back bg-white shadow-lg border-2 ${borderClass}`}>
-          <div className={`${textClass} font-bold text-lg`} data-testid={`prize-text-${position}`}>
+          <div className={`${textClass} font-bold text-sm sm:text-base lg:text-lg px-2`} data-testid={`prize-text-${position}`}>
             {prizeText}
           </div>
         </div>
