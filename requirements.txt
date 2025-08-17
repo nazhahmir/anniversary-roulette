@@ -1,0 +1,16 @@
+# Deal or No Deal Anniversary Game - Dependencies
+
+# Core Runtime Dependencies
+node>=18.0.0
+npm>=9.0.0
+
+# Database
+postgresql>=14.0.0
+
+# Environment Variables Required
+DATABASE_URL=your_neon_database_url_here
+PORT=5000
+NODE_ENV=development
+
+# Optional Dependencies
+# bufferutil (for WebSocket performance optimization) 

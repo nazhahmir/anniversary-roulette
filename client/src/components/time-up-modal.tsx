@@ -18,7 +18,7 @@ interface TimeUpModalProps {
 export default function TimeUpModal({ isOpen, finalPrize, onClose }: TimeUpModalProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className="max-w-md bg-white" data-testid="time-up-modal">
+      <AlertDialogContent className="max-w-2xl mx-auto w-[95vw] max-h-[90vh] overflow-y-auto bg-white" data-testid="time-up-modal">
         <AlertDialogHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-red-100 p-4 rounded-full">
@@ -34,17 +34,17 @@ export default function TimeUpModal({ isOpen, finalPrize, onClose }: TimeUpModal
                 <Gift className="text-coral" size={20} />
                 <div className="text-lg font-semibold text-dark-blue">Your Anniversary Prize:</div>
               </div>
-              <div className="text-xl font-bold text-coral">{finalPrize}</div>
+              <div className="text-lg font-bold text-coral break-words leading-relaxed">{finalPrize}</div>
             </div>
-            <div className="text-gray-600">
+            <div className="text-gray-600 leading-relaxed">
               The timer ran out, but don't worry! The system has automatically selected a wonderful anniversary surprise for you.
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="justify-center">
+        <AlertDialogFooter className="flex justify-center mt-6">
           <AlertDialogAction
             onClick={onClose}
-            className="bg-coral hover:bg-pink-600 text-white px-8 py-3 text-lg font-bold"
+            className="bg-coral hover:bg-pink-600 text-white px-8 py-3 text-lg font-bold rounded-xl"
             data-testid="button-close-time-up"
           >
             Claim Your Prize!

@@ -265,10 +265,10 @@ export default function Home() {
   }
 
   // Show game completion screen if game is complete
-  if (gameState?.isGameComplete && (gameState.finalPrize || gameState.cashedOut)) {
+  if (gameState?.isGameComplete) {
     return (
       <GameCompleteScreen
-        finalPrize={gameState.finalPrize || ""}
+        finalPrize={gameState.finalPrize || "A wonderful anniversary surprise!"}
         cashedOut={gameState.cashedOut}
         onPlayAgain={handleResetGame}
       />
@@ -402,8 +402,11 @@ export default function Home() {
       {/* Time Up Modal */}
       <TimeUpModal
         isOpen={showTimeUpModal}
-        finalPrize={gameState?.finalPrize || ""}
-        onClose={() => setShowTimeUpModal(false)}
+        finalPrize={gameState?.finalPrize || "A wonderful anniversary surprise!"}
+        onClose={() => {
+          setShowTimeUpModal(false);
+          // The game should already be complete at this point, so the GameCompleteScreen will show
+        }}
       />
     </div>
   );
