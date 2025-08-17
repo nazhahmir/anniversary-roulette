@@ -1,6 +1,14 @@
 # Deal or No Deal Anniversary Game
 
-A modern web-based "Deal or No Deal" anniversary gift game built with React, TypeScript, and Node.js. This application creates an interactive and romantic gaming experience perfect for anniversary celebrations, featuring a beautiful pastel UI and complete game flow management.
+## The Story Behind This Game
+
+My dad had no idea what to get my mom for their 25th Anniversary, so I decided to create this game for them both to play to give them some options. This game is a play on Deal or No Deal, where there are a certain amount of envelopes with prizes underneath. 
+
+There is an Admin panel, where the settings of the game can be set, and a Player Mode, where they can actually play the game. My dad can decide his settings in the Admin mode, where he can select the number of available prizes, how many chances my mom has to choose, and the prizes. He can also choose to prefill the prizes with the preexisting available prizes, pulled from a PostgreSQL database. All of the preexisting options are from around the San Francisco Bay area.
+
+This project was born from a desire to make their anniversary special and give them a fun, interactive way to discover romantic activities and experiences they could enjoy together. The game combines the excitement of Deal or No Deal with personalized, local experiences that make their celebration truly memorable.
+
+---
 
 ## Features
 
@@ -52,7 +60,7 @@ A modern web-based "Deal or No Deal" anniversary gift game built with React, Typ
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/nazhahmir/anniversary-roulette
    cd anniversary-roulette
    ```
 
@@ -65,7 +73,7 @@ A modern web-based "Deal or No Deal" anniversary gift game built with React, Typ
    ```bash
    # Create .env file
    DATABASE_URL=your_neon_database_url_here
-   PORT=5000
+   PORT=4000
    NODE_ENV=development
    ```
 
@@ -81,7 +89,7 @@ A modern web-based "Deal or No Deal" anniversary gift game built with React, Typ
    ```
 
 6. **Open your browser**
-   Navigate to `http://localhost:5000`
+   Navigate to `http://localhost:4000`
 
 ## Project Structure
 
@@ -128,7 +136,7 @@ anniversary-roulette/
 ## Customization
 
 ### Colors
-The game uses a custom pastel color palette with solid colors (no gradients):
+The game uses a custom pastel color palette:
 - **Envelope colors**: Coral, Mint, Sky, Sage, Warm-yellow, Blush
 - **Background**: Light pink throughout the game
 - **Text contrast**: Darker variants for better readability on white backgrounds
@@ -147,12 +155,6 @@ Configure via admin panel or database:
 - Prize distribution
 
 ## Development
-
-### Adding New Components
-1. Create component in `client/src/components/`
-2. Use Shadcn/ui components for consistency
-3. Follow the existing component patterns
-4. Add TypeScript types for props
 
 ### Database Changes
 1. Modify `shared/schema.ts`
@@ -207,7 +209,7 @@ I successfully set up a PostgreSQL database using **Neon** (neon.tech) and initi
 ### Development
 ```bash
 # Start the development server
-DATABASE_URL="postgresql://neondb_owner:npg_r2O4apgLCnjx@ep-super-star-afogs8jq-pooler.c-2.us-west-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require" PORT=4000 npm run dev
+DATABASE_URL="postgresql://username:password@your-database-host/database-name?sslmode=require" PORT=4000 npm run dev
 ```
 
 ### Access the Game
@@ -232,27 +234,5 @@ The game is fully functional and ready for deployment!
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Roadmap
-
-- [ ] Multi-player support
-- [ ] Custom prize categories
-- [ ] Advanced animations
-- [ ] Sound effects
-- [ ] Leaderboard system
-- [ ] Social sharing features
-
-## Support
-
-For issues and questions:
-1. Check the existing issues
-2. Create a new issue with detailed description
-3. Include steps to reproduce the problem
-
----
 
 **Made with love for special anniversary moments** 

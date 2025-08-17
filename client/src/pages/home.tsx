@@ -306,8 +306,9 @@ export default function Home() {
   const calculateGridLayout = (envelopeCount: number) => {
     if (envelopeCount <= 0) return { cols: 1, rows: 1 };
     
-    // For 6 envelopes: 2x3, for 10: 2x5, for 12: 3x4
+    // For 6 envelopes: 2x3, for 8: 2x4, for 10: 2x5, for 12: 3x4
     if (envelopeCount === 6) return { cols: 3, rows: 2 };
+    if (envelopeCount === 8) return { cols: 4, rows: 2 }; // 2 rows of 4 for better balance
     if (envelopeCount === 10) return { cols: 5, rows: 2 };
     if (envelopeCount === 12) return { cols: 4, rows: 3 };
     
